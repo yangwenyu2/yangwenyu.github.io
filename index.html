@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨文宇：AI伦理研究之路交互式规划书</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #f7fafc; 
+            color: #2d3748; 
+        }
+        .section-title {
+            font-size: 2.5rem; 
+            font-weight: 700;
+            color: #1a202c; 
+        }
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: #4a5568; 
+        }
+        .nav-link {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+            padding: 0.75rem 1rem;
+            border-radius: 0.375rem; 
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #2b6cb0; 
+            background-color: #ebf8ff; 
+            transform: translateY(-1px);
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
+            transition: all 0.3s ease-in-out;
+            border: 1px solid #e2e8f0; 
+        }
+        .card:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .path-toggle-container {
+            background-color: #e2e8f0; 
+            border-radius: 9999px; 
+            padding: 0.25rem;
+            display: inline-flex;
+        }
+        .path-toggle {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 9999px;
+            font-weight: 500;
+        }
+        .path-toggle.active {
+            background-color: #3182ce; 
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(49, 130, 206, 0.3), 0 2px 4px -1px rgba(49, 130, 206, 0.2);
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -37px; 
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px; 
+            height: 24px;
+            border-radius: 50%;
+            background-color: #3182ce; 
+            border: 4px solid white; 
+            box-shadow: 0 0 0 3px #3182ce; 
+        }
+        .timeline-line {
+            border-left-width: 3px; 
+            border-color: #cbd5e0; 
+        }
+        .risk-card .risk-back {
+            transform: rotateY(180deg);
+        }
+        .risk-card:hover .risk-front {
+            transform: rotateY(-180deg);
+        }
+        .risk-card:hover .risk-back {
+            transform: rotateY(0deg);
+        }
+        .risk-card-inner {
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        }
+        .risk-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden; 
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 480px; 
+            margin-left: auto;
+            margin-right: auto;
+            height: 380px; 
+            max-height: 420px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 420px;
+            }
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .hero-gradient-text {
+            background: linear-gradient(to right, #4299e1, #3182ce, #2b6cb0);
+            -webkit-background-clip: text;
+            background-clip: text; /* Standard property added */
+            -webkit-text-fill-color: transparent;
+        }
+        .icon-bullet {
+            color: #3182ce; 
+            margin-right: 0.5rem;
+            margin-top: 0.25rem; 
+            flex-shrink: 0; 
+        }
+        .advantage-label {
+            width: 5rem; 
+            font-weight: 600; 
+            color: #2f855a; 
+            flex-shrink: 0;
+        }
+        .disadvantage-label {
+            width: 5rem; 
+            font-weight: 600; 
+            color: #c53030; 
+            flex-shrink: 0;
+        }
+
+    </style>
+</head>
+<body class="text-gray-800 antialiased">
+
+    <nav id="navbar" class="bg-white/90 backdrop-blur-lg sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20"> 
+                <div class="flex-shrink-0">
+                    <span class="text-2xl font-semibold text-gray-800">杨文宇 | 职业规划</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-2"> 
+                        <a onclick="scrollToSection('hero')" class="nav-link text-sm font-medium text-gray-600 active">卷首</a>
+                        <a onclick="scrollToSection('strengths')" class="nav-link text-sm font-medium text-gray-600">核心优势</a>
+                        <a onclick="scrollToSection('blueprint')" class="nav-link text-sm font-medium text-gray-600">双轨蓝图</a>
+                        <a onclick="scrollToSection('strategy')" class="nav-link text-sm font-medium text-gray-600">行动方略</a>
+                        <a onclick="scrollToSection('risks')" class="nav-link text-sm font-medium text-gray-600">风险棋局</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="hero" class="py-24 md:py-40 bg-gradient-to-br from-sky-50 via-slate-50 to-stone-50"> 
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-5xl md:text-7xl font-extrabold text-gray-900 leading-tight">
+                    <span class="block">联结<span class="hero-gradient-text">哲学智慧</span>与<span class="hero-gradient-text">技术实践</span></span>
+                    <span class="block text-4xl md:text-6xl mt-3">探索AI伦理与安全之路</span>
+                </h1>
+                <p class="mt-10 max-w-3xl mx-auto text-lg md:text-xl text-gray-700">
+                    我是杨文宇，一名中国人民大学哲学院的2024级科学技术哲学专业硕士生研究生。本网页旨在系统性地呈现我的职业愿景：以自身哲学背景的理论思辨为根基，结合在小米等团队参与大模型研发的实践经验，致力于在AI伦理与安全领域进行开创性研究，为构建负责任、可信赖的智能未来贡献力量。
+                </p>
+                <div class="mt-16 flex justify-center items-center space-x-6 md:space-x-10 text-gray-700">
+                    <div class="text-center p-4 bg-white/50 rounded-xl shadow-sm">
+                        <div class="text-3xl md:text-4xl font-bold text-blue-600">思辨</div>
+                        <div class="text-base md:text-lg mt-1">哲学理论功底</div>
+                    </div>
+                    <div class="text-5xl md:text-6xl font-thin text-gray-400">+</div>
+                    <div class="text-center p-4 bg-white/50 rounded-xl shadow-sm">
+                        <div class="text-3xl md:text-4xl font-bold text-blue-600">实践</div>
+                        <div class="text-base md:text-lg mt-1">AI产业经验</div>
+                    </div>
+                    <div class="text-5xl md:text-6xl font-thin text-gray-400">=</div>
+                     <div class="text-center p-4 bg-white/50 rounded-xl shadow-sm">
+                        <div class="text-3xl md:text-4xl font-bold text-blue-600">志向</div>
+                        <div class="text-base md:text-lg mt-1">AI伦理与安全</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="strengths" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20">
+                    <h2 class="section-title">我的核心优势</h2>
+                    <p class="section-subtitle mt-6 max-w-3xl mx-auto">独特的跨学科背景是我最宝贵的资产，它构成了我探索AI伦理新蓝海的基石。</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-10 md:gap-16 items-start"> 
+                    <div class="card p-8 md:p-10">
+                        <h3 class="text-3xl font-bold mb-6 text-center text-blue-700">学术象牙塔：理论深度</h3>
+                        <p class="text-gray-700 mb-8 text-lg leading-relaxed">我的学术之旅始于对“爱智慧”的纯粹向往，并在持续深耕中逐渐聚焦于科技与社会的交叉地带。优异的学业成绩、多项科研项目经历以及在核心期刊的论文发表，共同筑就了我坚实的理论根基。</p>
+                        <ul class="space-y-4 text-gray-700 text-md">
+                            <li class="flex items-start"><span class="icon-bullet">🎓</span><div><strong>顶尖学府背景:</strong> 本科（东北大学，专业第一）及硕士（中国人民大学，满绩）的系统哲学训练。</div></li>
+                            <li class="flex items-start"><span class="icon-bullet">✍️</span><div><strong>丰硕科研成果:</strong> 在《自然辩证法研究》等CSSCI期刊发表论文，并主持并参与多项国家级及省部级科研项目。</div></li>
+                            <li class="flex items-start"><span class="icon-bullet">🗣️</span><div><strong>活跃学术交流:</strong> 参与近二十场国内外学术会议并发言，荣获多次优秀论文奖励。</div></li>
+                        </ul>
+                        <div class="mt-10">
+                            <h4 class="text-xl font-semibold text-center mb-5">核心研究领域</h4>
+                            <div class="chart-container">
+                                <canvas id="researchChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card p-8 md:p-10">
+                        <h3 class="text-3xl font-bold mb-6 text-center text-green-700">产业炼金炉：实践广度</h3>
+                        <p class="text-gray-700 mb-8 text-lg leading-relaxed">理论学习与实践探索相辅相成。在小米科技担任大模型算法工程师的经历，让我得以深入AI研发核心，将哲学思辨直接应用于价值对齐与模型安全等现实挑战，扮演独特的“哲学工程师”角色。</p>
+                         <ul class="space-y-4 text-gray-700 text-md">
+                            <li class="flex items-start"><span class="icon-bullet text-green-500">🤖</span><div><strong>小米核心经验:</strong> 深度参与自研大模型Pre-training-SFT-RL全流程，负责哲学推理增强、价值对齐与政治安全工作。</div></li>
+                            <li class="flex items-start"><span class="icon-bullet text-green-500">🛠️</span><div><strong>全栈技能栈:</strong> 熟悉LLM训练流程、数据工程、模型评估与Prompt工程，并参与算法改进。</div></li>
+                            <li class="flex items-start"><span class="icon-bullet text-green-500">🌐</span><div><strong>多元实践者:</strong> 兼具媒体编辑、政务实习、签约小说作者、知识博主等多重身份，展现卓越的沟通与适应能力。</div></li>
+                        </ul>
+                        <div class="mt-10 bg-green-50 p-6 rounded-lg border border-green-200">
+                            <h4 class="text-xl font-semibold text-center mb-4 text-green-800">关键实践贡献</h4>
+                             <p class="text-md text-green-700 leading-relaxed">在小米，我不仅是理论的旁观者，更是实践的参与者。通过数据工程、模型评估与算法改进，我为Mimo大模型的安全能力提升做出了实质性贡献，例如：构建了覆盖十多个领域的3k政治知识benchmark，并通过RLHF训练，将模型的政治安全能力提升至国内第一梯队水平。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="blueprint" class="py-24 bg-slate-50"> 
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="section-title">我的双轨蓝图</h2>
+                    <p class="section-subtitle mt-6 max-w-3xl mx-auto">学术研究是我的首要理想，产业实践是我的备选路径。两者相辅相成，共同指向一个核心目标：推动AI向善发展。</p>
+                </div>
+                <div class="flex justify-center mb-12">
+                    <div class="path-toggle-container">
+                        <button id="path-academia" class="path-toggle w-36 text-center px-6 py-3 text-md rounded-full active" onclick="switchPath('academia')">
+                            象牙塔之路
+                        </button>
+                        <button id="path-industry" class="path-toggle w-36 text-center px-6 py-3 text-md rounded-full" onclick="switchPath('industry')">
+                            炼金炉之道
+                        </button>
+                    </div>
+                </div>
+
+                <div class="max-w-4xl mx-auto"> 
+                    <div id="content-academia" class="transition-opacity duration-500 ease-in-out">
+                        <div class="grid md:grid-cols-2 gap-8 items-stretch"> 
+                            <div class="card p-8">
+                                <h3 class="text-2xl font-bold text-blue-700 mb-5">路径一：深耕学术，成为思想引领者</h3>
+                                 <p class="text-gray-700 mb-6 leading-relaxed">这是我的首要目标。我渴望在大学的殿堂里，对AI的根本性伦理问题进行系统、原创的研究，培养下一代具备批判性思维的AI人才，并通过思想的力量影响社会。</p>
+                                 <div class="space-y-5">
+                                    <div>
+                                        <h4 class="font-semibold text-lg text-gray-800">长期目标</h4>
+                                        <p class="text-gray-600 mt-1">成为AI伦理与安全领域的知名大学教授和研究者。</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-lg text-gray-800">环境机遇</h4>
+                                        <ul class="list-disc list-inside text-gray-600 space-y-1 mt-2 pl-1">
+                                            <li>“哲学吞噬AI”趋势，哲学价值日益凸显。</li>
+                                            <li>国家战略支持AI治理研究，交叉学科资助增多。</li>
+                                            <li>技术哲学、AI伦理等方向在学术界仍有增长潜力。</li>
+                                        </ul>
+                                    </div>
+                                 </div>
+                            </div>
+                            <div class="card bg-blue-50 p-8 border-blue-200">
+                                 <h4 class="font-semibold text-xl text-blue-800 text-center mb-5">路径优劣势分析</h4>
+                                 <ul class="space-y-4">
+                                    <li class="flex items-start">
+                                        <span class="advantage-label">优势:</span>
+                                        <div class="text-gray-700">较高的智力自由度，可自主探索前沿问题；通过研究和教学产生长远、深刻的社会影响；完成“非升即走”后职业稳定性相对较高。</div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="disadvantage-label">劣势:</span>
+                                        <div class="text-gray-700">“非升即走”压力大，学术职位竞争异常激烈；薪酬水平相对较低；科研资源获取受限。</div>
+                                    </li>
+                                 </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="content-industry" class="hidden transition-opacity duration-500 ease-in-out">
+                         <div class="grid md:grid-cols-2 gap-8 items-stretch">
+                            <div class="card p-8">
+                                <h3 class="text-2xl font-bold text-green-700 mb-5">路径二：投身产业，成为实践变革者</h3>
+                                 <p class="text-gray-700 mb-6 leading-relaxed">这是我的备选方案。如果现实条件需要，我将把所学应用于产业一线，在大型科技公司内部推动负责任AI的落地，通过产品和策略产生直接、广泛的现实影响。</p>
+                                 <div class="space-y-5">
+                                    <div>
+                                        <h4 class="font-semibold text-lg text-gray-800">长期目标</h4>
+                                        <p class="text-gray-600 mt-1">成为顶尖科技公司AI伦理/安全/治理部门的领导者或核心专家。</p>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-semibold text-lg text-gray-800">环境机遇</h4>
+                                        <ul class="list-disc list-inside text-gray-600 space-y-1 mt-2 pl-1">
+                                            <li>AI伦理、安全、治理等岗位需求旺盛且薪资优厚。</li>
+                                            <li>企业日益重视负责任AI，为专业人才提供舞台。</li>
+                                            <li>能够接触海量数据和计算资源，直面真实挑战。</li>
+                                        </ul>
+                                    </div>
+                                 </div>
+                            </div>
+                            <div class="card bg-green-50 p-8 border-green-200">
+                                 <h4 class="font-semibold text-xl text-green-800 text-center mb-5">路径优劣势分析</h4>
+                                 <ul class="space-y-4">
+                                    <li class="flex items-start">
+                                        <span class="advantage-label">优势:</span>
+                                        <div class="text-gray-700">薪酬待遇优厚，职业发展路径清晰；能将理念快速转化为有影响力的产品或政策；拥有更充裕的资源。</div>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <span class="disadvantage-label">劣势:</span>
+                                        <div class="text-gray-700">智力自由度相对较低，需服务于商业目标；面临“伦理漂白”风险；职业稳定性受行业周期影响。</div>
+                                    </li>
+                                 </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="strategy" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20">
+                    <h2 class="section-title">我的行动方略</h2>
+                    <p class="section-subtitle mt-6 max-w-3xl mx-auto">千里之行，始于足下。我已将宏伟蓝图分解为可执行、可衡量的具体步骤，并制定了清晰的时间表。</p>
+                </div>
+
+                <div class="relative max-w-3xl mx-auto"> 
+                    <div class="timeline-line absolute h-full top-0 left-[-19px]"></div>
+                    
+                    <div class="space-y-20"> 
+                        <div class="timeline-item pl-12 relative"> 
+                            <h3 class="text-3xl font-bold text-blue-600 mb-3">短期目标 (1-2年)</h3>
+                            <p class="text-md text-gray-500 mb-6">硕士在读 & 博士申请阶段</p>
+                            <div class="card p-8 shadow-lg">
+                                <ul class="space-y-4 text-gray-700 text-md">
+                                    <li><strong class="text-blue-700">学业精进：</strong>以优异成绩完成硕士课程，保持高绩点。</li>
+                                    <li><strong class="text-blue-700">深化研究：</strong>聚焦道德物化与价值对齐，力争以第一作者身份发表1-2篇高质量论文。</li>
+                                    <li><strong class="text-blue-700">成功申博：</strong>精心准备，力争获得国内外顶尖大学相关专业的博士录取资格。</li>
+                                    <li><strong class="text-blue-700">技能拓展：</strong>持续关注AI技术进展，提升对技术原理的理解。</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item pl-12 relative">
+                            <h3 class="text-3xl font-bold text-blue-600 mb-3">中期目标 (3-7年)</h3>
+                            <p class="text-md text-gray-500 mb-6">博士在读 & 早期职业生涯</p>
+                            <div class="card p-8 shadow-lg">
+                                <ul class="space-y-4 text-gray-700 text-md">
+                                    <li><strong class="text-blue-700">完成博士学业：</strong>完成高原创性博士论文，对AI伦理的哲学基础做出实质性贡献。</li>
+                                    <li><strong class="text-blue-700">成果发表：</strong>将博士论文核心成果转化为高水平期刊论文或专著。</li>
+                                    <li><strong class="text-blue-700">获得教职：</strong>成功应聘国内外知名大学的讲师/助理教授/助理研究员教职（或申请博士后职位作为过渡）。</li>
+                                    <li><strong class="text-blue-700">教学实践：</strong>结合自媒体经历，开发并讲授AI伦理相关课程，积累教学经验。</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item pl-12 relative">
+                            <h3 class="text-3xl font-bold text-blue-600 mb-3">长期目标 (7年以上)</h3>
+                            <p class="text-md text-gray-500 mb-6">职业发展成熟期</p>
+                            <div class="card p-8 shadow-lg">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-4">学术路径：</h4>
+                                <ul class="space-y-4 text-gray-700 mb-8 text-md">
+                                    <li><strong class="text-blue-700">学术引领：</strong>在AI哲学与伦理领域建立学术声望，成为活跃的思想贡献者。</li>
+                                    <li><strong class="text-blue-700">职业晋升：</strong>完成“非升即走”并晋升至更高职称（副教授/教授）。</li>
+                                    <li><strong class="text-blue-700">团队与项目：</strong>争取主持国家社科基金青年/一般项目，并有能力组建跨学科研究团队。</li>
+                                    <li><strong class="text-blue-700">社会影响：</strong>积极参与公共政策咨询，为国家AI战略与治理建言献策。</li>
+                                </ul>
+                                <hr class="my-6 border-gray-300">
+                                <h4 class="text-xl font-semibold text-gray-800 mb-4">产业路径 (备选)：</h4>
+                                <ul class="space-y-4 text-gray-700 text-md">
+                                     <li><strong class="text-green-700">专业领导力：</strong>成为顶尖科技公司AI伦理/安全/治理部门的领导者或核心专家。</li>
+                                     <li><strong class="text-green-700">战略制定：</strong>主导制定公司级AI伦理战略与安全规范，推动负责任AI理念落地。</li>
+                                     <li><strong class="text-green-700">行业影响力：</strong>积极参与行业标准制定和公共对话，提升企业及行业AI治理水平。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="risks" class="py-24 bg-slate-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-20">
+                    <h2 class="section-title">我的风险棋局</h2>
+                    <p class="section-subtitle mt-6 max-w-3xl mx-auto">深谋远虑，方能行稳致远。我已对潜在风险进行较为全面的评估，并制定了相应的应对策略。请将鼠标悬停于卡片上查看应对之策。</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div class="risk-card h-56 perspective-1000"> 
+                        <div class="risk-card-inner relative w-full h-full">
+                            <div class="risk-face risk-front absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-yellow-50 border-yellow-200">
+                                <h4 class="text-xl font-bold text-yellow-700">博士申请失利</h4>
+                                <p class="text-md text-yellow-600 mt-2">未能进入理想的博士项目。</p>
+                            </div>
+                            <div class="risk-face risk-back absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-yellow-400 text-white">
+                                <h4 class="font-bold text-lg mb-2">应对策略</h4>
+                                <p class="text-sm leading-relaxed">广泛申请，分散风险；分析原因，弥补不足后再次申请；或先从事研究助理/进入产业界积累经验。</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="risk-card h-56 perspective-1000">
+                        <div class="risk-card-inner relative w-full h-full">
+                            <div class="risk-face risk-front absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-red-50 border-red-200">
+                                <h4 class="text-xl font-bold text-red-700">学术就业困难</h4>
+                                <p class="text-md text-red-600 mt-2">教职市场竞争激烈，获得理想职位不易。</p>
+                            </div>
+                            <div class="risk-face risk-back absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-red-500 text-white">
+                                <h4 class="font-bold text-lg mb-2">应对策略</h4>
+                                <p class="text-sm leading-relaxed">提升自身学术成果履历；积极构建学术网络；保持地点灵活性；考虑博士后职位作为过渡；随时准备启动产业路径。</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="risk-card h-56 perspective-1000">
+                        <div class="risk-card-inner relative w-full h-full">
+                            <div class="risk-face risk-front absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-blue-50 border-blue-200">
+                                <h4 class="text-xl font-bold text-blue-700">研究陷入瓶颈</h4>
+                                <p class="text-md text-blue-600 mt-2">研究方向过时或被“学术抢跑”。</p>
+                            </div>
+                            <div class="risk-face risk-back absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-blue-500 text-white">
+                                <h4 class="font-bold text-lg mb-2">应对策略</h4>
+                                <p class="text-sm leading-relaxed">保持研究方向的适度灵活性；寻求跨学科合作激发创新；形成自己独特的、难以被简单复制的理论深度。</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="risk-card h-56 perspective-1000">
+                        <div class="risk-card-inner relative w-full h-full">
+                            <div class="risk-face risk-front absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-green-50 border-green-200">
+                                <h4 class="text-xl font-bold text-green-700">理想与现实冲突</h4>
+                                <p class="text-md text-green-600 mt-2">若进入产业界，可能面临商业目标与哲学理想的矛盾。</p>
+                            </div>
+                            <div class="risk-face risk-back absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-green-500 text-white">
+                                <h4 class="font-bold text-lg mb-2">应对策略</h4>
+                                <p class="text-sm leading-relaxed">选择有真正伦理承诺的公司；坚持专业操守和伦理底线；寻求在现实约束下实现“最大公约数”式的积极改变。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="risk-card h-56 perspective-1000">
+                        <div class="risk-card-inner relative w-full h-full">
+                            <div class="risk-face risk-front absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-purple-50 border-purple-200">
+                                <h4 class="text-xl font-bold text-purple-700">技术迭代过快</h4>
+                                <p class="text-md text-purple-600 mt-2">AI领域知识更新迅速，有落后风险。</p>
+                            </div>
+                            <div class="risk-face risk-back absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-purple-500 text-white">
+                                <h4 class="font-bold text-lg mb-2">应对策略</h4>
+                                <p class="text-sm leading-relaxed">建立终身学习机制；通过多种渠道（文献、会议、产业）持续追踪前沿动态；保持对核心技术原理的理解。</p>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="risk-card h-56 perspective-1000">
+                        <div class="risk-card-inner relative w-full h-full">
+                            <div class="risk-face risk-front absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-gray-100 border-gray-300"> 
+                                <h4 class="text-xl font-bold text-gray-700">职业倦怠</h4>
+                                <p class="text-md text-gray-600 mt-2">高强度学习和工作可能导致身心健康问题。</p>
+                            </div>
+                            <div class="risk-face risk-back absolute w-full h-full card flex flex-col items-center justify-center p-6 text-center bg-gray-600 text-white">
+                                <h4 class="font-bold text-lg mb-2">应对策略</h4>
+                                <p class="text-sm leading-relaxed">建立健康作息；积极锻炼身体；学会压力管理；保持工作与生活平衡。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white"> 
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
+            <p class="text-base text-gray-400">&copy; 2025 杨文宇职业规划。本规划将每年动态修订，以适应不断变化的个人与外部环境。</p>
+            <p class="mt-2 text-sm text-gray-500">以思辨之光，照亮技术之路。</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const researchChartCtx = document.getElementById('researchChart').getContext('2d');
+            new Chart(researchChartCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['后现象学', '道德物化', '价值对齐', 'AI安全', 'STS'],
+                    datasets: [{
+                        label: '研究兴趣强度',
+                        data: [7, 10, 8, 6, 6],
+                        backgroundColor: 'rgba(49, 130, 206, 0.2)', 
+                        borderColor: 'rgba(49, 130, 206, 1)',
+                        pointBackgroundColor: 'rgba(49, 130, 206, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(49, 130, 206, 1)',
+                        borderWidth: 2, 
+                        pointRadius: 4, 
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 15, 
+                                    family: "'Noto Sans SC', sans-serif",
+                                    weight: '500'
+                                },
+                                color: '#2d3748'
+                            },
+                            ticks: {
+                                backdropColor: 'transparent',
+                                stepSize: 2,
+                                font: { size: 10 },
+                                color: '#4a5568'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            enabled: true,
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            titleFont: { size: 14 },
+                            bodyFont: { size: 12 },
+                            padding: 10
+                        }
+                    }
+                }
+            });
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            const sections = document.querySelectorAll('main section');
+            const navbar = document.getElementById('navbar');
+            const navbarHeight = navbar.offsetHeight;
+
+            const observerOptions = {
+                root: null,
+                rootMargin: `-${navbarHeight + 20}px 0px 0px 0px`, 
+                threshold: 0.3 
+            };
+
+            const sectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('onclick') === `scrollToSection('${entry.target.id}')`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                sectionObserver.observe(section);
+            });
+        });
+
+        function switchPath(path) {
+            const academiaBtn = document.getElementById('path-academia');
+            const industryBtn = document.getElementById('path-industry');
+            const academiaContent = document.getElementById('content-academia');
+            const industryContent = document.getElementById('content-industry');
+            
+            academiaContent.style.opacity = 0;
+            industryContent.style.opacity = 0;
+
+            setTimeout(() => {
+                if (path === 'academia') {
+                    academiaBtn.classList.add('active');
+                    industryBtn.classList.remove('active');
+                    academiaContent.classList.remove('hidden');
+                    industryContent.classList.add('hidden');
+                    setTimeout(() => academiaContent.style.opacity = 1, 50);
+                } else {
+                    industryBtn.classList.add('active');
+                    academiaBtn.classList.remove('active');
+                    industryContent.classList.remove('hidden');
+                    academiaContent.classList.add('hidden');
+                     setTimeout(() => industryContent.style.opacity = 1, 50);
+                }
+            }, 150); 
+        }
+
+        function scrollToSection(sectionId) {
+             const section = document.getElementById(sectionId);
+             if(section) {
+                const navbarHeight = document.getElementById('navbar').offsetHeight;
+                const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - navbarHeight; 
+                 window.scrollTo({
+                     top: sectionTop,
+                     behavior: 'smooth'
+                 });
+             }
+        }
+    </script>
+</body>
+</html>
